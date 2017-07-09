@@ -1,0 +1,14 @@
+tutorials/
+tests/
+.gitgub/
+.tern-project
+.travis.yml
+deploy.sh
+deploy_key.enc
+docs/**
+node_modules/
+coverage/
+*.vim
+npm-debug.log
+.jsdoc.json
+test.js
