@@ -1,0 +1,211 @@
+#!/bin/sh
+':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
+
+var fs    = require('fs');
+var path  = require('path');
+var spawn = require('child_process').spawn;
+var exec  = require('child_process').exec;
+
+var env       = process.env;
+var $HOME     = env.HOME;
+var $LOGNAME  = env.LOGNAME;
+var $LAUNCHER = env.UDISKIE_DMENU_LAUNCHER || 'dmenu';
+var MOUNT_DIR = `/run/media/${$LOGNAME}`;
+
+
+main();
+
+function main() {
+    runCommand('udiskie-info -C -2 -a -o "{ui_label}: {mount_path}"', function(err, blockDevices) {
+        if (err) {
+            return notifyIfErr(err);
+        }
+
+        blockDevices = prettyPrint(blockDevices);
+
+        getSelection(blockDevices, function(err, selection) {
+
+            if (err) {
+                console.error(err);
+                return notifyIfErr(err);
+            } else if (!selection) {
+                return;
+            }
+
+            var options = parseUdiskieInfo(blockDevices);
+            selection = parseUdiskieInfo(selection);
+
+            var targets = [];
+
+            Object.keys(selection).forEach(function(path) {
+                Object.keys(options).forEach(function(p) {
+                    if (~p.indexOf(path) && p.match(/^\/dev\/sd[a-z]{1}\d{1}$/)) {
+                        var label, mountPath;
+
+                        if (options[p].trim().match(/^\/run\/media\//)) {
+                            mountPath = options[p];
+                        } else {
+                            label = options[p];
+                        }
+
+                        targets.push({
+                            label: label && label.trim(),
+                            mountPath: mountPath && mountPath.trim(),
+                            path: p
+                        });
+                    }
+                });
+            });
+
+            targets.forEach(function(device) {
+                if (device.mountPath) {
+                    return runCommand(`udiskie-umount ${device.mountPath}`, notifyIfErr);
+                } else if (device.label) {
+                    return runCommand(`udiskie-mount ${device.path}`, notifyIfErr);
+                } else {
+                    notifyIfErr(`Nothing to unmount / mount`);
+                }
+            });
+        });
+    });
+}
+
+
+/**
+ * @param {String} str
+ *
+ * @return {String}
+ */
+function prettyPrint(str) {
+    var list = str.split('\n');
+    var out = '';
+
+    list.forEach(function(item) {
+        if (!item) {
+            return;
+        }
+        item = item.split(':');
+        var devPath = item[0] && item[0].trim();
+        var label = item[1] && item[1].trim();
+        var mountPath = item[2] && item[2].trim();
+
+        if (devPath.length < 9) {
+            devPath = stretchStr(devPath, 9);
+        }
+
+        out += `${devPath}:  ${mountPath || label}\n`;
+    });
+
+    return out;
+
+    function stretchStr(str, len) {
+        for (var i = 0, len = len - str.length; i < len; i++) {
+            str += ' ';
+        }
+        return str;
+    }
+}
+
+
+/**
+ * @param {Error} err
+ *
+ * @return {undefined}
+ */
+function notifyIfErr(err) {
+    if (!err) {
+        return
+    }
+
+    err = (err.message && err.message || err);
+
+    return runCommand(`notify-send "${err}"`, function(err) {
+        if (err) {
+            console.error(err);
+        }
+        process.exit(1);
+    });
+}
+
+
+/**
+ * @param {String} str
+ * @return {Object}
+ */
+function parseUdiskieInfo(str) {
+    var out = {}
+
+    str.split('\n').forEach(function(device) {
+        var data = device.split(':');
+        var devicePath = data[0];
+        var labelOrMountPath = data[1];
+
+        var re = devicePath.trim().match(/^\/dev\/sd[a-z]{1}\d{0,1}$/i);
+        var found = devicePath.trim().match(re);
+
+        if (found) {
+            out[devicePath.trim()] = labelOrMountPath;
+        }
+    });
+
+    return out;
+}
+
+/**
+ * runCommand
+ *
+ * @param {string} command - stdout from dmenu
+ *
+ * @callback(err, dataString)
+ */
+function runCommand(command, callback) {
+
+    exec(command, function(error, stdout, stderr) {
+        if (stderr) {
+            console.error(command + ' errror: ' + stderr.toString());
+            return callback(error);
+        }
+
+        if (error) {
+            console.error(error);
+            return callback(error);
+        }
+        return callback(null, stdout);
+    });
+}
+
+
+
+/**
+ * getSelection
+ *
+ * @param {String} data - options to choose from
+ *
+ * @callback(err, selection)
+ * @return {undefined}
+ */
+function getSelection(data, callback) {
+    var stdout;
+    var stderr
+    var dmenu = spawn($LAUNCHER, process.argv.slice(1));
+
+    dmenu.stdin.write(data);
+    dmenu.stdin.end();
+
+    dmenu.stdout.on('data', function (data) {    // register one or more handlers
+        stdout = data.toString().trim();
+    });
+
+    dmenu.stderr.on('data', function (data) {
+        stderr = data;
+        console.error('dmenu errror: ' + data.toString());
+    });
+
+    dmenu.on('exit', function (code) {
+        if (code !== 0 && (stdout || stderr)) {
+            console.error('dmenu returned with code ' + code);
+            return callback(code);
+        }
+        return callback(undefined, stdout);
+    });
+}

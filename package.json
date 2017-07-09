@@ -1,0 +1,12 @@
+{
+  "name": "udiskie-dmenu",
+  "version": "0.1.0",
+  "author": "fogine <fogine@opmbx.org",
+  "description": "the script provides bridge between udiskie python module and dmenu compatible applications",
+  "private": false,
+  "scripts": {
+  },
+  "main": "./udiskie-dmenu",
+  "bin": "./udiskie-dmenu",
+  "license": "MIT"
+}
