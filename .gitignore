@@ -1,1 +1,6 @@
+docs/**
+node_modules/
+coverage/
 .tern-project
+*.vim
+npm-debug.log
