@@ -12,18 +12,17 @@ var $LOGNAME  = env.LOGNAME;
 var $LAUNCHER = env.UDISKIE_DMENU_LAUNCHER || 'dmenu';
 var MOUNT_DIR = `/run/media/${$LOGNAME}`;
 
-
 main();
 
 function main() {
-    runCommand('udiskie-info -C -2 -a -o "{ui_label}: {mount_path}"', function(err, blockDevices) {
+    runCommand(`udiskie-info -C -2 -a -o '"label":"{ui_label}", "isLuks":"{is_luks}", "mountPath": "{mount_path}"'`, function(err, blockDevices) {
         if (err) {
             return notifyIfErr(err);
         }
 
-        blockDevices = prettyPrint(blockDevices);
+        var options = parseUdiskieInfo(blockDevices);
 
-        getSelection(blockDevices, function(err, selection) {
+        getSelection(prettyPrint(options), function(err, selection) {
 
             if (err) {
                 console.error(err);
@@ -32,36 +31,33 @@ function main() {
                 return;
             }
 
-            var options = parseUdiskieInfo(blockDevices);
-            selection = parseUdiskieInfo(selection);
+            selection = parseSelection(selection);
 
             var targets = [];
 
             Object.keys(selection).forEach(function(path) {
                 Object.keys(options).forEach(function(p) {
                     if (~p.indexOf(path) && p.match(/^\/dev\/sd[a-z]{1}\d{1}$/)) {
-                        var label, mountPath;
-
-                        if (options[p].trim().match(/^\/run\/media\//)) {
-                            mountPath = options[p];
-                        } else {
-                            label = options[p];
-                        }
-
-                        targets.push({
-                            label: label && label.trim(),
-                            mountPath: mountPath && mountPath.trim(),
-                            path: p
-                        });
+                        targets.push(options[p]);
                     }
                 });
             });
 
             targets.forEach(function(device) {
+                var udiskieOpt = '';
+
                 if (device.mountPath) {
-                    return runCommand(`udiskie-umount ${device.mountPath}`, notifyIfErr);
+                    if (device.isLuks) {
+                        udiskieOpt = '--force';
+                    }
+                    //
+                    return runCommand(`udiskie-umount ${udiskieOpt} "${device.mountPath}"`, notifyIfErr);
                 } else if (device.label) {
-                    return runCommand(`udiskie-mount ${device.path}`, notifyIfErr);
+                    if (device.isLuks) {
+                        udiskieOpt = '--recursive';
+                    }
+                    //
+                    return runCommand(`udiskie-mount ${udiskieOpt} "${device.devPath}"`, notifyIfErr);
                 } else {
                     notifyIfErr(`Nothing to unmount / mount`);
                 }
@@ -70,30 +66,23 @@ function main() {
     });
 }
 
-
 /**
- * @param {String} str
+ * @param {Object} parsedUdiskieInfo - output of parseUdiskieInfo
  *
  * @return {String}
  */
-function prettyPrint(str) {
-    var list = str.split('\n');
+function prettyPrint(parsedUdiskieInfo) {
     var out = '';
 
-    list.forEach(function(item) {
-        if (!item) {
-            return;
-        }
-        item = item.split(':');
-        var devPath = item[0] && item[0].trim();
-        var label = item[1] && item[1].trim();
-        var mountPath = item[2] && item[2].trim();
+    Object.keys(parsedUdiskieInfo).forEach(function(devPath) {
+        var device = parsedUdiskieInfo[devPath];
 
+        //align first column to the left side
         if (devPath.length < 9) {
             devPath = stretchStr(devPath, 9);
         }
 
-        out += `${devPath}:  ${mountPath || label}\n`;
+        out += `${devPath}:  ${device.mountPath || device.label}\n`;
     });
 
     return out;
@@ -105,7 +94,6 @@ function prettyPrint(str) {
         return str;
     }
 }
-
 
 /**
  * @param {Error} err
@@ -127,12 +115,43 @@ function notifyIfErr(err) {
     });
 }
 
-
 /**
  * @param {String} str
  * @return {Object}
  */
 function parseUdiskieInfo(str) {
+    var out = {}
+
+    str.split('\n').forEach(function(device) {
+        if (!device) {
+            return;
+        }
+
+        var data, labelOrMountPath, mountPath, label;
+        data = JSON.parse(`{${device}}`);
+        data.devPath = data.label.split(':')[0].trim();
+        data.label = data.label.split(':')[1].trim();
+        data.isLuks = data.isLuks && JSON.parse(data.isLuks.toLowerCase());
+
+        var key = data.devPath.trim();
+
+        if (out.hasOwnProperty(key) && out[key].mountPath && !data.mountPath) {
+            return;
+        } else if (out.hasOwnProperty(key) && out[key].isLuks && !data.isLuks) {
+            return;
+        }
+
+        out[key] = data;
+    });
+
+    return out;
+}
+
+/**
+ * @param {String} str
+ * @return {Object}
+ */
+function parseSelection(str) {
     var out = {}
 
     str.split('\n').forEach(function(device) {
@@ -144,7 +163,7 @@ function parseUdiskieInfo(str) {
         var found = devicePath.trim().match(re);
 
         if (found) {
-            out[devicePath.trim()] = labelOrMountPath;
+            out[devicePath.trim()] = labelOrMountPath.trim();
         }
     });
 
@@ -173,8 +192,6 @@ function runCommand(command, callback) {
         return callback(null, stdout);
     });
 }
-
-
 
 /**
  * getSelection
