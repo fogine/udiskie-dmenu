@@ -1,6 +1,5 @@
 # udiskie-dmenu
-Lightweight nodejs script which allows to manage removable devices via `dmenu` (`rofi`) like applications.  
-This script depends on [udiskie](https://github.com/coldfix/udiskie) (a UDisks front-end that allows to manage removeable media).
+Lightweight nodejs script which allows to manage removable devices via `dmenu` (or `rofi`).  
 
 Installation
 -------------------
@@ -12,6 +11,12 @@ Features
 -------------------
 * mount
 * umount
+* Supports Luks encrypted devices
+
+Dependencies
+-------------------
+* [udiskie](https://github.com/coldfix/udiskie) (python `udisks` & `udisks2` front-end)
+* [rofi](https://github.com/DaveDavenport/rofi/) OR [dmenu](http://tools.suckless.org/dmenu/)
 
 Usage
 -------------------
@@ -25,5 +30,5 @@ Usage
 ### dmenu
 
 ```bash
-    > udiskie-dmenu
+    > udiskie-dmenu [dmenu-options]
 ```
