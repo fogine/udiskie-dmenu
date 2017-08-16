@@ -204,7 +204,7 @@ function runCommand(command, callback) {
 function getSelection(data, callback) {
     var stdout;
     var stderr
-    var dmenu = spawn($LAUNCHER, process.argv.slice(1));
+    var dmenu = spawn($LAUNCHER, process.argv.slice(2));
 
     dmenu.stdin.write(data);
     dmenu.stdin.end();
