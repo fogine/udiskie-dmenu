@@ -1,6 +1,8 @@
 # udiskie-dmenu
 Lightweight nodejs script which allows to manage removable devices via `dmenu` (or `rofi`).  
 
+![Preview](https://github.com/fogine/udiskie-dmenu/raw/master/udiskie-dmenu.gif)
+
 Installation
 -------------------
 `npm install -g udiskie-dmenu`
