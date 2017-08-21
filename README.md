@@ -10,7 +10,7 @@ Installation
 or copy the `udiskie-dmenu` executable somewhere to `$PATH`
 
 ##### Archlinux
-[udiskie-dmenu-git](https://github.com/fogine/udiskie-dmenu) AUR package
+[udiskie-dmenu-git](https://aur.archlinux.org/packages/udiskie-dmenu-git) AUR package
 
 Features
 -------------------
