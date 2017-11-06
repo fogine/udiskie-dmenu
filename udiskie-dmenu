@@ -127,10 +127,11 @@ function parseUdiskieInfo(str) {
             return;
         }
 
-        var data, labelOrMountPath, mountPath, label;
+        var data, labelOrMountPath, mountPath, label, deviceInfo;
         data = JSON.parse(`{${device}}`);
-        data.devPath = data.label.split(':')[0].trim();
-        data.label = data.label.split(':')[1].trim();
+        deviceInfo = data.label.split(':');
+        data.devPath = (deviceInfo.shift() || '').trim();
+        data.label = (deviceInfo.shift() || '').trim();
         data.isLuks = data.isLuks && JSON.parse(data.isLuks.toLowerCase());
 
         var key = data.devPath.trim();
