@@ -22,7 +22,7 @@ function main() {
 
         var options = parseUdiskieInfo(blockDevices);
 
-        getSelection(prettyPrint(options), function(err, selection) {
+        getSelection(prettyPrint(options), function(err, selection, code) {
 
             if (err) {
                 console.error(err);
@@ -44,17 +44,17 @@ function main() {
             });
 
             targets.forEach(function(device) {
-                var udiskieOpt = '';
+                var udiskieOpt = code === 10 ? '--detach' : '';
 
                 if (device.mountPath) {
                     if (device.isLuks) {
-                        udiskieOpt = '--force';
+                        udiskieOpt += '--force';
                     }
                     //
                     return runCommand(`udiskie-umount ${udiskieOpt} "${device.mountPath}"`, notifyIfErr);
                 } else if (device.label) {
                     if (device.isLuks) {
-                        udiskieOpt = '--recursive';
+                        udiskieOpt += '--recursive';
                     }
                     //
                     return runCommand(`udiskie-mount ${udiskieOpt} "${device.devPath}"`, notifyIfErr);
@@ -219,10 +219,11 @@ function getSelection(data, callback) {
     });
 
     dmenu.on('exit', function (code) {
-        if (code !== 0 && (stdout || stderr)) {
+        //status: 10 => custom keybinding for --detach option
+        if (code !== 0 && code !== 10 && (stdout || stderr)) {
             console.error('dmenu returned with code ' + code);
             return callback(code);
         }
-        return callback(undefined, stdout);
+        return callback(undefined, stdout, code);
     });
 }
