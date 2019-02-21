@@ -1,4 +1,8 @@
 
+## FUTURE
+
+* [ADDED] - support for removable devices which dont have any partition but rather filesystem is created on entire device - [#2](https://github.com/fogine/udiskie-dmenu/issues/2)
+
 ## 0.3.0
 
 * [FIXED] - a semantic error when a device didn't have any `label` - [#1](https://github.com/fogine/udiskie-dmenu/issues/1)
