@@ -1,7 +1,7 @@
 {
   "name": "udiskie-dmenu",
-  "version": "0.3.0",
-  "author": "fogine <fogine@opmbx.org",
+  "version": "0.4.0",
+  "author": "fogine",
   "description": "the script provides bridge between udiskie python module and dmenu compatible applications",
   "private": false,
   "files": [

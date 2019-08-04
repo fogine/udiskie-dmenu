@@ -1,7 +1,8 @@
 
-## FUTURE
+## 0.4.0
 
 * [ADDED] - support for removable devices which dont have any partition but rather filesystem is created on entire device - [#2](https://github.com/fogine/udiskie-dmenu/issues/2)
+* [ADDED] - notification when no devices are available - nothing to (u)mount
 
 ## 0.3.0
 
