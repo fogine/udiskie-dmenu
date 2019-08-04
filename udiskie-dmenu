@@ -21,7 +21,11 @@ function main() {
         }
 
         var options = parseUdiskieInfo(blockDevices);
-
+        
+        if (Object.keys(options).length === 0) {
+            process.exit(0);
+        }
+        
         getSelection(prettyPrint(options), function(err, selection, code) {
 
             if (err) {
