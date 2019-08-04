@@ -21,11 +21,12 @@ function main() {
         }
 
         var options = parseUdiskieInfo(blockDevices);
-        
+
         if (Object.keys(options).length === 0) {
+            notifyIfErr(`Nothing to unmount / mount`);
             process.exit(0);
         }
-        
+
         getSelection(prettyPrint(options), function(err, selection, code) {
 
             if (err) {
@@ -63,7 +64,7 @@ function main() {
                     //
                     return runCommand(`udiskie-mount ${udiskieOpt} "${device.devPath}"`, notifyIfErr);
                 } else {
-                    notifyIfErr(`Nothing to unmount / mount`);
+                    notifyIfErr(`Unknown device - aborting`);
                 }
             });
         });
