@@ -41,9 +41,20 @@ function main() {
             var targets = [];
 
             Object.keys(selection).forEach(function(path) {
-                Object.keys(options).forEach(function(p) {
-                    if (~p.indexOf(path) && p.match(/^\/dev\/sd[a-z]{1}\d{1}$/)) {
-                        targets.push(options[p]);
+                Object.keys(options).forEach(function(p, index, keys) {
+                    var isTheOnlyDevPath = keys.reduce(function(outcome, key, i) {
+                        if (!outcome) return outcome;
+                        if (~p.indexOf(path) && i !== index) return false;
+
+                        return true;
+                    }, true);
+
+                    if (~p.indexOf(path)) {
+                        if (p.match(/^\/dev\/sd[a-z]{1}\d{1}$/)
+                            || isTheOnlyDevPath
+                        ) {
+                            targets.push(options[p]);
+                        }
                     }
                 });
             });

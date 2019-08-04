@@ -22,6 +22,7 @@ Dependencies
 -------------------
 * [udiskie](https://github.com/coldfix/udiskie) (python `udisks` & `udisks2` front-end)
 * [rofi](https://github.com/DaveDavenport/rofi/) OR [dmenu](http://tools.suckless.org/dmenu/)
+* `notify-send`
 
 Usage
 -------------------
@@ -43,3 +44,7 @@ You must ensure that the key combination isn't already binded to other operation
 ```bash
     > udiskie-dmenu [dmenu-options]
 ```
+
+### system notifications
+
+To be notified about `mount` & `umount` device status, run `udiskie` as a daemon when system starts (see `man udiskie` for more info)
