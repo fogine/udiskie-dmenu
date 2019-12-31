@@ -198,7 +198,7 @@ function runCommand(command, callback) {
 
     exec(command, function(error, stdout, stderr) {
         if (stderr) {
-            console.error(command + ' errror: ' + stderr.toString());
+            console.error(command + ' error: ' + stderr.toString());
             return callback(error);
         }
 
@@ -232,7 +232,7 @@ function getSelection(data, callback) {
 
     dmenu.stderr.on('data', function (data) {
         stderr = data;
-        console.error('dmenu errror: ' + data.toString());
+        console.error('dmenu error: ' + data.toString());
     });
 
     dmenu.on('exit', function (code) {
