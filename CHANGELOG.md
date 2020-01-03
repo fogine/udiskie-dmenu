@@ -1,4 +1,8 @@
 
+## 0.5.0
+
+* [REMOVED] - udisks1 support
+
 ## 0.4.0
 
 * [ADDED] - support for removable devices which dont have any partition but rather filesystem is created on entire device - [#2](https://github.com/fogine/udiskie-dmenu/issues/2)
