@@ -15,7 +15,7 @@ var MOUNT_DIR = `/run/media/${$LOGNAME}`;
 main();
 
 function main() {
-    runCommand(`udiskie-info -C -2 -a -o '"label":"{ui_label}", "isLuks":"{is_luks}", "mountPath": "{mount_path}"'`, function(err, blockDevices) {
+    runCommand(`udiskie-info -C -a -o '"label":"{ui_label}", "isLuks":"{is_luks}", "mountPath": "{mount_path}"'`, function(err, blockDevices) {
         if (err) {
             return notifyIfErr(err);
         }

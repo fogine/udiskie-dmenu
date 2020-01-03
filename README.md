@@ -20,7 +20,7 @@ Features
 
 Dependencies
 -------------------
-* [udiskie](https://github.com/coldfix/udiskie) (python `udisks` & `udisks2` front-end)
+* [udiskie](https://github.com/coldfix/udiskie) (python `udisks2` front-end)
 * [rofi](https://github.com/DaveDavenport/rofi/) OR [dmenu](http://tools.suckless.org/dmenu/)
 * `notify-send`
 
