@@ -35,7 +35,7 @@ Usage
 
 User defined shortcut `-kb-custom-1` (defaults to `Alt+1`) will detach drive (umount) by e.g. powering down its physical port.  
 The following example redefines the custom shortcut to `Shift+Enter`:
-> UDISKIE_DMENU_LAUNCHER='rofi -kb-accept-alt "" -kb-custom-1 "Shift+Return"'
+> UDISKIE_DMENU_LAUNCHER='rofi' udiskie-dmenu -dmenu -kb-accept-alt "" -kb-custom-1 "Shift+Return"
 
 You must ensure that the key combination isn't already binded to other operation (in this case `-kb-accept-alt`).
 
