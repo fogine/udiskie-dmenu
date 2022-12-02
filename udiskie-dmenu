@@ -98,6 +98,11 @@ function prettyPrint(parsedUdiskieInfo) {
             devPath = stretchStr(devPath, 9);
         }
 
+        // Filter snap 
+        if (devPath.startsWith('/dev/loop')) {
+            return
+        }
+
         out += `${devPath}:  ${device.mountPath || device.label}\n`;
     });
 
