@@ -1,4 +1,8 @@
 
+## 0.6.0
+
+* [CHANGED] - /dev/loop devices are filter out from possible mount options
+
 ## 0.5.0
 
 * [REMOVED] - udisks1 support

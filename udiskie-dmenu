@@ -1,16 +1,11 @@
 #!/bin/sh
 ':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
 
-var fs    = require('fs');
-var path  = require('path');
 var spawn = require('child_process').spawn;
 var exec  = require('child_process').exec;
 
 var env       = process.env;
-var $HOME     = env.HOME;
-var $LOGNAME  = env.LOGNAME;
 var $LAUNCHER = env.UDISKIE_DMENU_LAUNCHER || 'dmenu';
-var MOUNT_DIR = `/run/media/${$LOGNAME}`;
 
 main();
 
@@ -98,11 +93,6 @@ function prettyPrint(parsedUdiskieInfo) {
             devPath = stretchStr(devPath, 9);
         }
 
-        // Filter snap 
-        if (devPath.startsWith('/dev/loop')) {
-            return
-        }
-
         out += `${devPath}:  ${device.mountPath || device.label}\n`;
     });
 
@@ -161,7 +151,10 @@ function parseUdiskieInfo(str) {
             return;
         } else if (out.hasOwnProperty(key) && out[key].isLuks && !data.isLuks) {
             return;
+        } else if (key.startsWith('/dev/loop')) { // Filter snap packages
+            return;
         }
+
 
         out[key] = data;
     });
