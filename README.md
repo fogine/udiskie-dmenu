@@ -1,5 +1,5 @@
 # udiskie-dmenu
-Lightweight nodejs script which allows to manage removable devices via `dmenu` (or `rofi`).  
+Lightweight nodejs script which allows to manage removable devices via `dmenu` (or `rofi` or `fuzzel`).  
 
 ![Preview](https://github.com/fogine/udiskie-dmenu/raw/master/udiskie-dmenu.gif)
 
@@ -27,7 +27,7 @@ Dependencies
 Usage
 -------------------
 
-#### rofi
+### rofi
 
 ```bash
     > UDISKIE_DMENU_LAUNCHER="rofi" udiskie-dmenu -matching regex -dmenu -i -no-custom -multi-select
@@ -38,6 +38,12 @@ The following example redefines the custom shortcut to `Shift+Enter`:
 > UDISKIE_DMENU_LAUNCHER='rofi' udiskie-dmenu -dmenu -kb-accept-alt "" -kb-custom-1 "Shift+Return"
 
 You must ensure that the key combination isn't already binded to other operation (in this case `-kb-accept-alt`).
+
+### fuzzel
+
+```bash
+    > UDISKIE_DMENU_LAUNCHER="fuzzel" udiskie-dmenu --dmenu
+```
 
 ### dmenu
 
